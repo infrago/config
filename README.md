@@ -1,51 +1,42 @@
 # config
 
-`config` 是 infrago 的模块包。
+`config` 是 infrago 的**模块**。
 
-## 安装
+## 包定位
 
-```bash
-go get github.com/infrago/config@latest
-```
+- 类型：模块
+- 作用：统一配置模块，负责配置读取与配置源抽象。
 
-## 最小接入
+## 主要功能
+
+- 对上提供统一模块接口
+- 对下通过驱动接口接入具体后端
+- 支持按配置切换驱动实现
+
+## 快速接入
 
 ```go
-package main
-
-import (
-    _ "github.com/infrago/config"
-    "github.com/infrago/infra"
-)
-
-func main() {
-    infra.Run()
-}
+import _ "github.com/infrago/config"
 ```
-
-## 配置示例
 
 ```toml
 [config]
 driver = "default"
 ```
 
-## 公开 API（摘自源码）
+## 驱动实现接口列表
 
-- `func (c *Module) Register(name string, value Any)`
-- `func (c *Module) RegisterDriver(name string, driver Driver)`
-- `func (c *Module) Config(Map) {}`
-- `func (c *Module) Setup()     {}`
-- `func (c *Module) Open()      {}`
-- `func (c *Module) Start()`
-- `func (c *Module) Stop()  {}`
-- `func (c *Module) Close() {}`
-- `func (c *Module) LoadConfig() (Map, error)`
-- `func (c *Module) Parse() (string, Map, error)`
-- `func (d *defaultConfigDriver) Load(params Map) (Map, error)`
+以下接口由驱动实现（来自模块 `driver.go`）：
 
-## 排错
+- 当前模块未提供独立驱动接口（或 driver.go 不存在）
 
-- 模块未运行：确认空导入已存在
-- driver 无效：确认驱动包已引入
-- 配置不生效：检查配置段名是否为 `[config]`
+## 全局配置项（所有配置键）
+
+配置段：`[config]`
+
+- 未检测到配置键（请查看模块源码的 configure 逻辑）
+
+## 说明
+
+- `setting` 一般用于向具体驱动透传专用参数
+- 多实例配置请参考模块源码中的 Config/configure 处理逻辑
